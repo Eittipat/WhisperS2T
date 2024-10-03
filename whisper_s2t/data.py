@@ -63,7 +63,8 @@ class BasicSegmenter:
             audio_duration = len(audio_signal)/self.sampling_rate
             
         start_ends = []
-        for i in range(0, int(audio_duration), int(self.max_seg_len)):
+        stop = max(1, int(audio_duration))
+        for i in range(0, stop, int(self.max_seg_len)):
             start_ends.append([i, i + self.max_seg_len])
         
         start_ends[-1][1] = min(audio_duration, start_ends[-1][1]) # fix edge
