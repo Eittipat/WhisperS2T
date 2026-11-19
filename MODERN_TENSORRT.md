@@ -33,9 +33,11 @@ the builder reduces the output limit to stay within 448 total positions.
 
 Old 0.8 engines are incompatible. Do not overwrite the production ZIP with an
 unvalidated engine. Cache identities include the runtime version, GPU name,
-compute capability and build limits. Engines built on an RTX 4070 Ti must be
-rebuilt and tested on the production L4; matching compute capability alone does
-not establish engine portability. Downloads verify the official checkpoint
+compute capability and build limits. A GPU model-name mismatch with matching
+compute capability logs a warning and allows TensorRT to attempt loading. Runtime
+version and compute-capability mismatches still block loading. Matching compute
+capability alone does not establish engine portability; validate loading and
+inference on the target GPU before production use. Downloads verify the official checkpoint
 SHA256. Conversion/build failures propagate and do not publish incomplete
 engine directories. Builds sharing this cache serialize with a file lock.
 

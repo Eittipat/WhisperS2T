@@ -4,6 +4,7 @@ import fcntl
 import hashlib
 import importlib.metadata
 import json
+import logging
 import os
 from pathlib import Path
 import shutil
@@ -14,6 +15,8 @@ from types import SimpleNamespace
 
 import torch
 from .download_utils import SAVE_DIR, download_model
+
+logger = logging.getLogger(__name__)
 
 TRT_LLM_VERSION = "1.2.1"
 
@@ -77,8 +80,15 @@ def load_trt_build_config(output_dir):
         raise ValueError("PyTorch version differs; rebuild this engine")
     if config["cuda_compute_capability"] != list(torch.cuda.get_device_capability()):
         raise ValueError("Engine GPU architecture differs; rebuild on this GPU")
-    if config["gpu_name"] != torch.cuda.get_device_name():
-        raise ValueError("Engine GPU model differs; rebuild on this GPU")
+    gpu_name = torch.cuda.get_device_name()
+    if config["gpu_name"] != gpu_name:
+        logger.warning(
+            "Engine was built on GPU %s but is loading on %s with matching "
+            "compute capability. Performance or compatibility may differ; "
+            "continuing with TensorRT engine loading.",
+            config["gpu_name"],
+            gpu_name,
+        )
     return SimpleNamespace(**config)
 
 
